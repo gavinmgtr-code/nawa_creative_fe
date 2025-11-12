@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sage-green: #9CAF88;
+  --charcoal-green-black: #2C3E2D;
+  --light-cream: #F5F5F0;
+  --white: #FFFFFF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--light-cream);
+  color: var(--charcoal-green-black);
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom utility classes */
+.bg-sage-green {
+  background-color: var(--sage-green);
+}
+
+.text-sage-green {
+  color: var(--sage-green);
+}
+
+.bg-charcoal-green-black {
+  background-color: var(--charcoal-green-black);
+}
+
+.text-charcoal-green-black {
+  color: var(--charcoal-green-black);
+}
+
+.bg-light-cream {
+  background-color: var(--light-cream);
+}
