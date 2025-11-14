@@ -12,6 +12,8 @@ const partners = [
 ]
 
 export default function ClientPartnerPreview() {
+  const duplicatedPartners = [...partners, ...partners, ...partners]
+
   return (
     <section className="py-20 bg-light-cream">
       <div className="container mx-auto px-4">
@@ -29,22 +31,58 @@ export default function ClientPartnerPreview() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-          {partners.map((partner, index) => (
+        {/* Infinite Scroll Container */}
+        <div className="relative">
+          {/* Gradient Overlays */}
+          <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-light-cream to-transparent z-10" />
+          <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-light-cream to-transparent z-10" />
+
+          {/* Scrolling Content */}
+          <div className="overflow-hidden">
             <motion.div
-              key={partner.name}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="flex justify-center"
+              className="flex space-x-8 py-4"
+              animate={{
+                x: [0, -1440], // Adjust based on content width
+              }}
+              transition={{
+                x: {
+                  repeat: Infinity,
+                  repeatType: "loop",
+                  duration: 40,
+                  ease: "linear",
+                },
+              }}
             >
-              <div className="grayscale hover:grayscale-0 transition-all duration-500 p-4 rounded-lg hover:bg-white hover:shadow-lg">
-                <div className="w-32 h-16 bg-gray-200 rounded flex items-center justify-center">
-                  <span className="text-sm text-gray-500 font-semibold">{partner.name}</span>
-                </div>
-              </div>
+              {duplicatedPartners.map((partner, index) => (
+                <motion.div
+                  key={`${partner.name}-${index}`}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="flex-shrink-0 w-40 h-20 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 grayscale hover:grayscale-0 flex items-center justify-center p-4 border border-gray-100 cursor-pointer"
+                >
+                  <div className="text-center">
+                    <span className="text-sm font-semibold text-gray-700">{partner.name}</span>
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
+          </div>
+        </div>
+
+        {/* Static Version for Mobile */}
+        <div className="mt-8 md:hidden">
+          <div className="grid grid-cols-2 gap-4">
+            {partners.map((partner, index) => (
+              <motion.div
+                key={partner.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="w-full h-16 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 grayscale hover:grayscale-0 flex items-center justify-center p-3 border border-gray-100"
+              >
+                <span className="text-xs font-semibold text-gray-700 text-center">{partner.name}</span>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
