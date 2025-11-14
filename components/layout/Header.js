@@ -1,12 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Phone } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -18,17 +27,20 @@ export default function Header() {
   ]
 
   return (
-    <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
+    <header className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
+        ? 'bg-white/95 backdrop-blur-lg shadow-lg py-2'
+        : 'bg-white/90 backdrop-blur-sm shadow-sm py-4'
+      }`}>
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
-          {/* Logo saja tanpa teks */}
+        <div className="flex justify-between items-center">
+          {/* Logo yang lebih besar */}
           <Link href="/" className="flex items-center">
-            <div className="w-46 h-14 relative"> {/* Ukuran diperbesar */}
+            <div className="w-60 h-16 relative transition-all duration-500 hover:scale-105"> {/* Ukuran diperbesar lagi */}
               <Image
                 src="/images/Logo.png"
                 alt="Nawa Creative"
-                width={160}
-                height={48}
+                width={240}
+                height={64}
                 className="object-contain w-full h-full"
                 priority
               />
@@ -36,54 +48,71 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-charcoal-green-black hover:text-sage-green transition-colors duration-300 font-medium"
+                className="text-charcoal-green-black hover:text-sage-green transition-all duration-300 font-medium relative group"
               >
                 {item.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-sage-green transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
+          </nav>
+
+          {/* Desktop CTA Buttons */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <div className="flex items-center space-x-2 text-charcoal-green-black mr-4">
+              <Phone size={16} className="text-sage-green" />
+              <span className="text-sm font-medium">085856651576</span>
+            </div>
             <Link
-              href="/booking"
-              className="bg-sage-green text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 font-semibold"
+              href="/app/about/page.js"
+              className="bg-sage-green text-white px-6 py-3 rounded-xl hover:bg-charcoal-green-black hover:scale-105 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
             >
               Booking Event
             </Link>
-          </nav>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-charcoal-green-black"
+            className="lg:hidden text-charcoal-green-black p-2 hover:bg-gray-100 rounded-lg transition-colors duration-300"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="lg:hidden py-6 border-t border-gray-200 bg-white/95 backdrop-blur-lg">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-charcoal-green-black hover:text-sage-green transition-colors duration-300 py-2 font-medium"
+                  className="text-charcoal-green-black hover:text-sage-green transition-all duration-300 py-3 font-medium text-lg border-b border-gray-100 hover:border-sage-green hover:pl-4"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
-              <Link
-                href="/booking"
-                className="bg-sage-green text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 text-center font-semibold"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Booking Event
-              </Link>
+
+              {/* Mobile Contact Info */}
+              <div className="pt-4 border-t border-gray-200">
+                <div className="flex items-center space-x-3 text-charcoal-green-black mb-4">
+                  <Phone size={20} className="text-sage-green" />
+                  <span className="font-medium">085856651576</span>
+                </div>
+                <Link
+                  href="/booking"
+                  className="block bg-sage-green text-white px-6 py-4 rounded-xl hover:bg-charcoal-green-black transition-all duration-300 font-semibold text-center text-lg shadow-lg"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Booking Event
+                </Link>
+              </div>
             </nav>
           </div>
         )}
