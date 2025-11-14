@@ -19,7 +19,7 @@ const featuredProjects = [
     category: 'Music Event',
     description: 'Kelanjutan sukses Vol.1 dengan line-up yang lebih beragam dan produksi yang lebih matang.',
     image: '/images/projects/excited-audience-watching-confetti-fireworks-having-fun-music-festival-night-copy-space.jpg',
-    year: '2024'
+    year: '2025'
   },
   {
     id: 3,

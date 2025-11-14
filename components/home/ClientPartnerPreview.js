@@ -6,9 +6,9 @@ const partners = [
   { name: 'Federal Oto', logo: '/images/partners/federal-oto.png' },
   { name: 'Decorations Co', logo: '/images/partners/decorations-co.png' },
   { name: 'Hear The Difference', logo: '/images/partners/htd.png' },
-  { name: 'SaiNieplak', logo: '/images/partners/sainieplak.png' },
+  { name: 'AsalNjeplak', logo: '/images/partners/sainieplak.png' },
   { name: 'Nayrrun', logo: '/images/partners/nayrrun.png' },
-  { name: 'Okukangz', logo: '/images/partners/okukangz.png' },
+  { name: 'Dkukangz', logo: '/images/partners/okukangz.png' },
 ]
 
 export default function ClientPartnerPreview() {

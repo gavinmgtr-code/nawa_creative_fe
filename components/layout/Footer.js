@@ -32,7 +32,7 @@ export default function Footer() {
             {/* Social Media */}
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://www.instagram.com/nawacreative.spaces/"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-sage-green hover:text-charcoal-green-black transition-all duration-300 group"
               >
                 <Instagram size={18} className="group-hover:scale-110 transition-transform" />
@@ -174,7 +174,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-sm text-gray-400">
-                © 2024 <span className="text-sage-green font-semibold">Mandala Nawa Creative</span> — All rights reserved.
+                © 2025 <span className="text-sage-green font-semibold">Mandala Nawa Creative</span> — All rights reserved.
               </p>
             </div>
 

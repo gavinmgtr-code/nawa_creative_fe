@@ -28,8 +28,8 @@ export default function Header() {
 
   return (
     <header className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
-        ? 'bg-white/95 backdrop-blur-lg shadow-lg py-2'
-        : 'bg-white/90 backdrop-blur-sm shadow-sm py-4'
+      ? 'bg-white/95 backdrop-blur-lg shadow-lg py-2'
+      : 'bg-white/90 backdrop-blur-sm shadow-sm py-4'
       }`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
@@ -67,8 +67,9 @@ export default function Header() {
               <Phone size={16} className="text-sage-green" />
               <span className="text-sm font-medium">085856651576</span>
             </div>
+
             <Link
-              href="/app/about/page.js"
+              href="/app/booking/page.js"
               className="bg-sage-green text-white px-6 py-3 rounded-xl hover:bg-charcoal-green-black hover:scale-105 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
             >
               Booking Event
@@ -101,10 +102,18 @@ export default function Header() {
 
               {/* Mobile Contact Info */}
               <div className="pt-4 border-t border-gray-200">
-                <div className="flex items-center space-x-3 text-charcoal-green-black mb-4">
+                import Link from "next/link";
+                import {Phone} from "lucide-react";
+
+                <Link
+                  href="085856651576"
+                  className="flex items-center space-x-3 text-sage-green hover:opacity-80 transition"
+                >
                   <Phone size={20} className="text-sage-green" />
                   <span className="font-medium">085856651576</span>
-                </div>
+                </Link>
+
+
                 <Link
                   href="/booking"
                   className="block bg-sage-green text-white px-6 py-4 rounded-xl hover:bg-charcoal-green-black transition-all duration-300 font-semibold text-center text-lg shadow-lg"

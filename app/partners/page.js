@@ -6,9 +6,9 @@ const partners = [
   { name: 'Federal Oto', logo: '/images/partners/federal-oto.png', category: 'Automotive' },
   { name: 'Decorations Co', logo: '/images/partners/decorations-co.png', category: 'Event Decor' },
   { name: 'Hear The Difference', logo: '/images/partners/htd.png', category: 'Audio Production' },
-  { name: 'SaiNieplak', logo: '/images/partners/sainieplak.png', category: 'Art Collective' },
+  { name: 'AsalNjeplak', logo: '/images/partners/sainieplak.png', category: 'Art Collective' },
   { name: 'Nayrrun', logo: '/images/partners/nayrrun.png', category: 'Music Artist' },
-  { name: 'Okukangz', logo: '/images/partners/okukangz.png', category: 'Content Creator' }
+  { name: 'Dkukangz', logo: '/images/partners/okukangz.png', category: 'Content Creator' }
 ]
 
 const caseStudies = [
@@ -20,7 +20,7 @@ const caseStudies = [
     image: '/images/cases/federal-case.jpg'
   },
   {
-    partner: 'SaiNieplak',
+    partner: 'AsalNjeplak',
     title: 'Urban Art Exhibition "Beyond Walls"',
     description: 'Kurasi dan produksi pameran seni urban yang menampilkan 15 seniman lokal di venue prestisius.',
     result: 'Menjual 85% dari total karya dan menarik perhatian media nasional dengan coverage di 5 media terkemuka.',

@@ -39,7 +39,7 @@ export default function ServicesHighlight() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-4">
-            Layanan Kami
+            Our service
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Setiap ide membutuhkan ruang yang tepat untuk tumbuh menjadi karya yang berdampak.

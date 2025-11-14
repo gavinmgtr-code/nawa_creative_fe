@@ -50,7 +50,7 @@ export default function AboutPreview() {
                 className="inline-flex items-center px-4 py-2 bg-sage-green/10 text-sage-green rounded-full text-sm font-semibold mb-4"
               >
                 <Sparkles size={16} className="mr-2" />
-                Tentang Kami
+                About Us
               </motion.span>
 
               <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-charcoal-green-black leading-tight">

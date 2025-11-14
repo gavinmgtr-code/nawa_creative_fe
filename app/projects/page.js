@@ -11,7 +11,7 @@ const allProjects = [
     category: 'Music Event',
     description: 'Festival musik indie pertama yang mempertemukan talenta lokal dengan audiens yang apresiatif.',
     image: '/images/projects/indiestage-vol1.jpg',
-    year: '2023'
+    year: '2024'
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const allProjects = [
     category: 'Music Event',
     description: 'Kelanjutan sukses Vol.1 dengan line-up yang lebih beragam dan produksi yang lebih matang.',
     image: '/images/projects/indiestage-vol2.jpg',
-    year: '2024'
+    year: '2025'
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const allProjects = [
   },
   {
     id: 4,
-    title: 'SaiNieplak Exhibition',
+    title: 'AsalNjeplak Exhibition',
     category: 'Art Exhibition',
     description: 'Pameran seni kontemporer yang menampilkan karya-karya inovatif dari seniman lokal.',
     image: '/images/projects/sainieplak-exhibition.jpg',
@@ -47,7 +47,7 @@ const allProjects = [
   },
   {
     id: 6,
-    title: 'Okukangz Podcast Studio',
+    title: 'Dkukangz Podcast Studio',
     category: 'Content Production',
     description: 'Pembangunan dan pengelolaan studio podcast untuk konten kreatif yang konsisten.',
     image: '/images/projects/okukangz-podcast.jpg',
