@@ -26,6 +26,14 @@ export default function Header() {
     { name: 'Partners', href: '/partners' },
   ]
 
+  // Fungsi untuk membuka WhatsApp
+  const openWhatsApp = () => {
+    const phoneNumber = '085856651576'
+    const message = 'Halo, saya ingin bertanya tentang layanan Nawa Creative'
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
+
   return (
     <header className={`fixed w-full z-50 transition-all duration-500 ${isScrolled
       ? 'bg-white/95 backdrop-blur-lg shadow-lg py-2'
@@ -35,7 +43,7 @@ export default function Header() {
         <div className="flex justify-between items-center">
           {/* Logo yang lebih besar */}
           <Link href="/" className="flex items-center">
-            <div className="w-60 h-16 relative transition-all duration-500 hover:scale-105"> {/* Ukuran diperbesar lagi */}
+            <div className="w-60 h-16 relative transition-all duration-500 hover:scale-105">
               <Image
                 src="/images/Logo.png"
                 alt="Nawa Creative"
@@ -63,13 +71,16 @@ export default function Header() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-charcoal-green-black mr-4">
-              <Phone size={16} className="text-sage-green" />
+            <button
+              onClick={openWhatsApp}
+              className="flex items-center space-x-2 text-charcoal-green-black hover:text-sage-green transition-all duration-300 group cursor-pointer"
+            >
+              <Phone size={16} className="text-sage-green group-hover:scale-110 transition-transform duration-300" />
               <span className="text-sm font-medium">085856651576</span>
-            </div>
+            </button>
 
             <Link
-              href="/app/booking/page.js"
+              href="/booking"
               className="bg-sage-green text-white px-6 py-3 rounded-xl hover:bg-charcoal-green-black hover:scale-105 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
             >
               Booking Event
@@ -101,18 +112,17 @@ export default function Header() {
               ))}
 
               {/* Mobile Contact Info */}
-              <div className="pt-4 border-t border-gray-200">
-                import Link from "next/link";
-                import {Phone} from "lucide-react";
-
-                <Link
-                  href="085856651576"
-                  className="flex items-center space-x-3 text-sage-green hover:opacity-80 transition"
+              <div className="pt-4 border-t border-gray-200 space-y-4">
+                <button
+                  onClick={() => {
+                    openWhatsApp()
+                    setIsMenuOpen(false)
+                  }}
+                  className="flex items-center space-x-3 text-sage-green hover:opacity-80 transition w-full text-left"
                 >
                   <Phone size={20} className="text-sage-green" />
                   <span className="font-medium">085856651576</span>
-                </Link>
-
+                </button>
 
                 <Link
                   href="/booking"
