@@ -88,7 +88,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-playfair font-bold mb-6 leading-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-playfair font-bold mb-7 leading-tight"
         >
           <span className="block">The Spaces of</span>
           <span className="block bg-gradient-to-r from-light-cream to-sage-green bg-clip-text text-transparent">
@@ -168,7 +168,6 @@ export default function Hero() {
           transition={{ duration: 1, delay: 1.2 }}
           className="text-sm text-gray-300"
         >
-          <p>Trusted by 50+ brands and creative talents</p>
         </motion.div>
       </div>
 

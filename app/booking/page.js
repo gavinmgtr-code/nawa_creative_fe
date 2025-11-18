@@ -4,14 +4,70 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Phone, Mail, Calendar, MapPin, Users, Star, CheckCircle, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 
+// API Service - DISESUAIKAN DENGAN SCHEMA PRISMA
+const bookingApi = {
+  async createBooking(bookingData) {
+    try {
+      // Transform frontend data to match backend DTO
+      const transformedData = {
+        brandName: bookingData.brandName,
+        contactName: bookingData.contactName,
+        phone: bookingData.phone,
+        email: bookingData.email,
+        eventDate: bookingData.eventDate ? new Date(bookingData.eventDate).toISOString() : null,
+        location: bookingData.location || null,
+        eventType: bookingData.eventType,
+        description: bookingData.description || null,
+        budget: bookingData.budget ? parseFloat(bookingData.budget) : null,
+        services: bookingApi.mapServiceNamesToIds(bookingData.services),
+      };
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+      const response = await fetch(`${API_URL}/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transformedData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      throw new Error(error.message || 'Failed to create booking');
+    }
+  },
+
+  // Map service names to IDs
+  mapServiceNamesToIds(serviceNames) {
+    const serviceMap = {
+      'Event Organizer': 1,
+      'Creative Agency': 2,
+      'Talent & Artist Management': 3,
+      'Brand Strategy': 4
+    };
+
+    return serviceNames.map(name => serviceMap[name]).filter(id => id !== undefined);
+  }
+};
+
 export default function Booking() {
   const [formData, setFormData] = useState({
     brandName: '',
-    contact: '',
+    contactName: '',
+    phone: '',
+    email: '',
     eventDate: '',
     location: '',
     eventType: '',
     description: '',
+    budget: '',
     services: []
   })
 
@@ -19,50 +75,59 @@ export default function Booking() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
 
+  // Service options
   const serviceOptions = [
     {
-      id: 'event-organizer',
+      id: 1,
       name: 'Event Organizer',
       icon: '🎪',
       description: 'Full event planning & execution'
     },
     {
-      id: 'creative-agency',
+      id: 2,
       name: 'Creative Agency',
       icon: '🎨',
       description: 'Design, branding & creative content'
     },
     {
-      id: 'talent-management',
+      id: 3,
       name: 'Talent & Artist Management',
       icon: '⭐',
       description: 'Artist booking & management'
     },
     {
-      id: 'brand-strategy',
+      id: 4,
       name: 'Brand Strategy',
       icon: '📈',
       description: 'Brand development & marketing strategy'
     }
   ]
 
+  // Event Type Options - DISESUAIKAN DENGAN ENUM EventType di Prisma
   const eventTypeOptions = [
-    'Brand Activation',
-    'Product Launch',
-    'Corporate Event',
-    'Music Festival',
-    'Art Exhibition',
-    'Private Gathering',
-    'Wedding Celebration',
-    'Conference & Seminar',
-    'Workshop & Training',
-    'Lainnya'
+    'CORPORATE',
+    'WEDDING',
+    'EXHIBITION',
+    'CONCERT',
+    'FESTIVAL',
+    'OTHER'
   ]
 
+  // Map untuk menampilkan label yang user-friendly
+  const eventTypeLabels = {
+    'CORPORATE': 'Corporate Event',
+    'WEDDING': 'Wedding Celebration',
+    'EXHIBITION': 'Art Exhibition',
+    'CONCERT': 'Music Concert',
+    'FESTIVAL': 'Festival',
+    'OTHER': 'Lainnya'
+  }
+
   const steps = [
-    { number: 1, title: 'Informasi Dasar', fields: ['brandName', 'contact'] },
-    { number: 2, title: 'Detail Event', fields: ['eventDate', 'location', 'eventType'] },
+    { number: 1, title: 'Informasi Dasar', fields: ['brandName', 'contactName', 'phone', 'email'] },
+    { number: 2, title: 'Detail Event', fields: ['eventDate', 'location', 'eventType', 'budget'] },
     { number: 3, title: 'Layanan & Kebutuhan', fields: ['services', 'description'] }
   ]
 
@@ -74,10 +139,18 @@ export default function Booking() {
       if (!formData.brandName.trim()) {
         newErrors.brandName = 'Nama brand wajib diisi'
       }
-      if (!formData.contact.trim()) {
-        newErrors.contact = 'Kontak wajib diisi'
-      } else if (!/^[\w\.-]+@[\w\.-]+\.\w+$|^08\d{8,11}$/.test(formData.contact)) {
-        newErrors.contact = 'Format email atau WhatsApp tidak valid'
+      if (!formData.contactName.trim()) {
+        newErrors.contactName = 'Nama kontak wajib diisi'
+      }
+      if (!formData.phone.trim()) {
+        newErrors.phone = 'Nomor WhatsApp wajib diisi'
+      } else if (!/^08\d{8,11}$/.test(formData.phone)) {
+        newErrors.phone = 'Format WhatsApp tidak valid (contoh: 081234567890)'
+      }
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email wajib diisi'
+      } else if (!/^[\w\.-]+@[\w\.-]+\.\w+$/.test(formData.email)) {
+        newErrors.email = 'Format email tidak valid'
       }
     }
 
@@ -93,6 +166,7 @@ export default function Booking() {
       if (!formData.eventType) {
         newErrors.eventType = 'Jenis acara wajib dipilih'
       }
+      // Budget optional, tidak perlu validasi required
     }
 
     if (step === 3) {
@@ -118,12 +192,18 @@ export default function Booking() {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
 
+    // Clear submit error when user makes changes
+    if (submitError) {
+      setSubmitError('')
+    }
+
     if (type === 'checkbox') {
+      const serviceId = parseInt(value)
       setFormData(prev => ({
         ...prev,
         services: checked
-          ? [...prev.services, value]
-          : prev.services.filter(service => service !== value)
+          ? [...prev.services, serviceId]
+          : prev.services.filter(id => id !== serviceId)
       }))
     } else {
       setFormData(prev => ({
@@ -133,17 +213,20 @@ export default function Booking() {
     }
   }
 
-  const handleServiceToggle = (serviceName) => {
+  const handleServiceToggle = (serviceId) => {
     setFormData(prev => ({
       ...prev,
-      services: prev.services.includes(serviceName)
-        ? prev.services.filter(service => service !== serviceName)
-        : [...prev.services, serviceName]
+      services: prev.services.includes(serviceId)
+        ? prev.services.filter(id => id !== serviceId)
+        : [...prev.services, serviceId]
     }))
 
-    // Clear services error if any service is selected
     if (errors.services) {
       setErrors(prev => ({ ...prev, services: '' }))
+    }
+
+    if (submitError) {
+      setSubmitError('')
     }
   }
 
@@ -155,31 +238,39 @@ export default function Booking() {
 
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1))
-    // Clear errors when going back
     setErrors({})
+    setSubmitError('')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Validate final step before submission
     if (!validateStep(3)) {
       return
     }
 
     setIsSubmitting(true)
+    setSubmitError('')
 
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log('Form submitted:', formData)
+      const result = await bookingApi.createBooking(formData)
+      console.log('Booking created successfully:', result)
       setIsSubmitted(true)
     } catch (error) {
       console.error('Submission error:', error)
-      alert('Terjadi kesalahan saat mengirim formulir. Silakan coba lagi.')
+      setSubmitError(error.message || 'Terjadi kesalahan saat mengirim formulir. Silakan coba lagi.')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const getServiceNameById = (serviceId) => {
+    const service = serviceOptions.find(s => s.id === serviceId)
+    return service ? service.name : 'Unknown Service'
+  }
+
+  const getEventTypeLabel = (eventType) => {
+    return eventTypeLabels[eventType] || eventType
   }
 
   // Render success page
@@ -217,11 +308,14 @@ export default function Booking() {
                   </h3>
                   <div className="text-left space-y-2 text-sm">
                     <p><strong>Brand:</strong> {formData.brandName}</p>
-                    <p><strong>Kontak:</strong> {formData.contact}</p>
-                    <p><strong>Event:</strong> {formData.eventType}</p>
-                    <p><strong>Tanggal:</strong> {new Date(formData.eventDate).toLocaleDateString('id-ID')}</p>
-                    <p><strong>Lokasi:</strong> {formData.location}</p>
-                    <p><strong>Layanan:</strong> {formData.services.join(', ')}</p>
+                    <p><strong>Nama Kontak:</strong> {formData.contactName}</p>
+                    <p><strong>WhatsApp:</strong> {formData.phone}</p>
+                    <p><strong>Email:</strong> {formData.email}</p>
+                    <p><strong>Event:</strong> {getEventTypeLabel(formData.eventType)}</p>
+                    <p><strong>Tanggal:</strong> {formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('id-ID') : 'Belum ditentukan'}</p>
+                    <p><strong>Lokasi:</strong> {formData.location || 'Belum ditentukan'}</p>
+                    {formData.budget && <p><strong>Budget Estimasi:</strong> Rp {parseFloat(formData.budget).toLocaleString('id-ID')}</p>}
+                    <p><strong>Layanan:</strong> {formData.services.map(id => getServiceNameById(id)).join(', ')}</p>
                   </div>
                 </div>
 
@@ -310,8 +404,8 @@ export default function Booking() {
                 <div key={step.number} className="flex items-center flex-1">
                   <div className="flex flex-col items-center">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 font-semibold transition-all duration-300 ${currentStep >= step.number
-                        ? 'bg-sage-green border-sage-green text-white'
-                        : 'border-gray-300 text-gray-400'
+                      ? 'bg-sage-green border-sage-green text-white'
+                      : 'border-gray-300 text-gray-400'
                       }`}>
                       {currentStep > step.number ? <CheckCircle size={20} /> : step.number}
                     </div>
@@ -341,6 +435,21 @@ export default function Booking() {
               transition={{ duration: 0.6 }}
               className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-100"
             >
+              {submitError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700"
+                >
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    {submitError}
+                  </div>
+                </motion.div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-8">
                 <AnimatePresence mode="wait">
                   {/* Step 1: Basic Information */}
@@ -383,23 +492,65 @@ export default function Booking() {
                         </div>
 
                         <div>
-                          <label htmlFor="contact" className="block text-lg font-semibold text-gray-800 mb-3">
-                            Kontak (Email atau WhatsApp) *
+                          <label htmlFor="contactName" className="block text-lg font-semibold text-gray-800 mb-3">
+                            Nama Kontak *
                           </label>
                           <input
                             type="text"
-                            id="contact"
-                            name="contact"
-                            value={formData.contact}
+                            id="contactName"
+                            name="contactName"
+                            value={formData.contactName}
                             onChange={handleChange}
                             required
-                            className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg ${errors.contact ? 'border-red-500' : 'border-gray-200'
+                            className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg ${errors.contactName ? 'border-red-500' : 'border-gray-200'
                               }`}
-                            placeholder="email@contoh.com atau 08xxxxxxxxxx"
+                            placeholder="Nama lengkap Anda"
                           />
-                          {errors.contact && (
-                            <p className="text-red-500 text-sm mt-2">{errors.contact}</p>
+                          {errors.contactName && (
+                            <p className="text-red-500 text-sm mt-2">{errors.contactName}</p>
                           )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label htmlFor="phone" className="block text-lg font-semibold text-gray-800 mb-3">
+                              WhatsApp *
+                            </label>
+                            <input
+                              type="text"
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleChange}
+                              required
+                              className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg ${errors.phone ? 'border-red-500' : 'border-gray-200'
+                                }`}
+                              placeholder="081234567890"
+                            />
+                            {errors.phone && (
+                              <p className="text-red-500 text-sm mt-2">{errors.phone}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label htmlFor="email" className="block text-lg font-semibold text-gray-800 mb-3">
+                              Email *
+                            </label>
+                            <input
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              required
+                              className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg ${errors.email ? 'border-red-500' : 'border-gray-200'
+                                }`}
+                              placeholder="email@contoh.com"
+                            />
+                            {errors.email && (
+                              <p className="text-red-500 text-sm mt-2">{errors.email}</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -437,6 +588,7 @@ export default function Booking() {
                               value={formData.eventDate}
                               onChange={handleChange}
                               required
+                              min={new Date().toISOString().split('T')[0]}
                               className={`w-full pl-14 pr-4 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg ${errors.eventDate ? 'border-red-500' : 'border-gray-200'
                                 }`}
                             />
@@ -470,27 +622,51 @@ export default function Booking() {
                         </div>
                       </div>
 
-                      <div>
-                        <label htmlFor="eventType" className="block text-lg font-semibold text-gray-800 mb-3">
-                          Jenis Acara *
-                        </label>
-                        <select
-                          id="eventType"
-                          name="eventType"
-                          value={formData.eventType}
-                          onChange={handleChange}
-                          required
-                          className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg appearance-none bg-white ${errors.eventType ? 'border-red-500' : 'border-gray-200'
-                            }`}
-                        >
-                          <option value="">Pilih jenis acara</option>
-                          {eventTypeOptions.map(type => (
-                            <option key={type} value={type}>{type}</option>
-                          ))}
-                        </select>
-                        {errors.eventType && (
-                          <p className="text-red-500 text-sm mt-2">{errors.eventType}</p>
-                        )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label htmlFor="eventType" className="block text-lg font-semibold text-gray-800 mb-3">
+                            Jenis Acara *
+                          </label>
+                          <select
+                            id="eventType"
+                            name="eventType"
+                            value={formData.eventType}
+                            onChange={handleChange}
+                            required
+                            className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg appearance-none bg-white ${errors.eventType ? 'border-red-500' : 'border-gray-200'
+                              }`}
+                          >
+                            <option value="">Pilih jenis acara</option>
+                            {eventTypeOptions.map(type => (
+                              <option key={type} value={type}>
+                                {eventTypeLabels[type]}
+                              </option>
+                            ))}
+                          </select>
+                          {errors.eventType && (
+                            <p className="text-red-500 text-sm mt-2">{errors.eventType}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label htmlFor="budget" className="block text-lg font-semibold text-gray-800 mb-3">
+                            Budget Estimasi (Optional)
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">Rp</span>
+                            <input
+                              type="number"
+                              id="budget"
+                              name="budget"
+                              value={formData.budget}
+                              onChange={handleChange}
+                              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-sage-green focus:border-sage-green transition-all duration-300 text-lg"
+                              placeholder="Contoh: 50000000"
+                              min="0"
+                            />
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2">Isi jika sudah ada estimasi budget</p>
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -526,17 +702,17 @@ export default function Booking() {
                               key={service.id}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              className={`flex items-start p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 ${formData.services.includes(service.name)
-                                  ? 'border-sage-green bg-sage-green/5'
-                                  : 'border-gray-200 hover:border-sage-green/50'
+                              className={`flex items-start p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 ${formData.services.includes(service.id)
+                                ? 'border-sage-green bg-sage-green/5'
+                                : 'border-gray-200 hover:border-sage-green/50'
                                 } ${errors.services ? 'border-red-200' : ''}`}
                             >
                               <input
                                 type="checkbox"
                                 name="services"
-                                value={service.name}
-                                checked={formData.services.includes(service.name)}
-                                onChange={() => handleServiceToggle(service.name)}
+                                value={service.id}
+                                checked={formData.services.includes(service.id)}
+                                onChange={() => handleServiceToggle(service.id)}
                                 className="mt-1 w-5 h-5 text-sage-green focus:ring-sage-green border-gray-300 rounded"
                               />
                               <div className="ml-3">
@@ -569,6 +745,9 @@ export default function Booking() {
                         {errors.description && (
                           <p className="text-red-500 text-sm mt-2">{errors.description}</p>
                         )}
+                        <p className="text-sm text-gray-500 mt-2">
+                          Minimal 20 karakter (tersisa: {Math.max(0, 20 - formData.description.length)})
+                        </p>
                       </div>
                     </motion.div>
                   )}
